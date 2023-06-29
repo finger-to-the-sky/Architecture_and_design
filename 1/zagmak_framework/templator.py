@@ -2,7 +2,7 @@ from jinja2 import Template
 from os.path import join
 
 
-def render(template_name, folder='templates', **kwargs):
+def render(template_name, folder='1/templates', **kwargs):
     """
 
     :param template_name:

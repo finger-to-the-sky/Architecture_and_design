@@ -18,5 +18,6 @@ fronts = [date_front, other_front]
 application = Framework(routes=routes, fronts=fronts)
 
 with make_server('', 8000, application) as httpd:
-    print('Server has been running on: http://localhost:8000/')
+    print('Server has been running on: http://localhost:8000/\n'
+          'You can also check this page: http://localhost:8000/elements/')
     httpd.serve_forever()
