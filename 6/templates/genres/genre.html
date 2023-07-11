@@ -10,8 +10,8 @@
 </form>
     <ul>
         {% for item in objects_list %}
-        <li>
-            {{item.name}} <span>Количество фильмов: {{item.films_count()}}</span>
+        <li class="list_component">
+            {{item.name}} <span>({{item.films_count()}})</span>
         </li>
         {% endfor %}
     </ul>

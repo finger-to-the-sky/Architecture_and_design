@@ -161,3 +161,11 @@ class LogoutView:
     def __call__(self, request):
         Engine.current_user = 'Guest'
         return '200 OK', render('index.html', objects_list=site.genres)
+
+
+# Данный список нет смысла делать общедоступным, так как это не платформа общения людей между собой,
+# поэтому в шаблоне я ограничу доступ только для пользователя с ником Admin или admin.
+@AppRoute(routes=routes, url='/users-list/')
+class UsersListView:
+    def __call__(self, request):
+        return '200 OK', render('users/user_list.html', users_list=site.users)
