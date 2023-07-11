@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="alt">
+    <h2>Sign Up</h2>
+    <form method="post" action="#">
+        <ul>
+            <li>
+                <input type="text" name="username" class="form-fields" placeholder="Username"/>
+            </li>
+            <li>
+                <input type="email" name="email" class="form-fields" placeholder="Email"/>
+            </li>
+            <li>
+                <input type="password" name="password" class="form-fields" placeholder="Password">
+            </li>
+            <li>
+                <input type="password" name="confirm-password" class="form-fields" placeholder="Confirm Password">
+            </li>
+            <li>
+                <button type="submit" class="submit-button">Sign Up</button>
+            </li>
+        </ul>
+    </form>
+</div>
+{% endblock %}
