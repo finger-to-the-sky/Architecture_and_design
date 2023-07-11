@@ -154,3 +154,10 @@ class RegistrationView:
                 return '200 OK', render('register/registration.html', error='Пароли не совпадают!')
         else:
             return '200 OK', render('register/registration.html')
+
+
+@AppRoute(routes=routes, url='/logout/')
+class LogoutView:
+    def __call__(self, request):
+        Engine.current_user = 'Guest'
+        return '200 OK', render('index.html', objects_list=site.genres)
