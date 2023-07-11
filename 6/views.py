@@ -123,4 +123,22 @@ class LoginView:
 @AppRoute(routes=routes, url='/register/')
 class RegistrationView:
     def __call__(self, request):
-        return '200 OK', render('register/registration.html')
+        if request['method'] == 'POST':
+            data = request['data']
+            username, email, password, confirm_password = \
+                site.decode_value(data['username']),\
+                site.decode_value(data['email']),\
+                site.decode_value(data['password']), \
+                site.decode_value(data['confirm-password'])
+
+            if password == confirm_password:
+                new_user = site.create_user(username=username, email=email, password=password)
+                site.users.append(new_user)
+                print(f'Пользователь № {site.users.index(site.users[-1])} '
+                      f'с ником {username} успешно зарегистрирован!')
+
+                return '201 OK', render('register/login.html')
+            else:
+                return '200 OK', render('register/registration.html', error='Пароли не совпадают!')
+        else:
+            return '200 OK', render('register/registration.html')

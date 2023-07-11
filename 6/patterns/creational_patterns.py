@@ -2,6 +2,19 @@ from copy import deepcopy
 from quopri import decodestring
 
 
+# Так как пользователи не будут иметь типы, потому что все, что они будут делать
+# на киносайте - это комментировать и оценивать фильмы, создаем обычный класс.
+class User:
+    """
+    Usual User class for login and Registration
+    """
+
+    def __init__(self, username, email, password):
+        self.username = username
+        self.email = email
+        self.password = password
+
+
 # Prototype method
 class FilmPrototype:
 
@@ -60,6 +73,7 @@ class Engine:
     def __init__(self):
         self.films = []
         self.genres = []
+        self.users = []
 
     @staticmethod
     def create_genre(name, genre=None):
@@ -86,6 +100,10 @@ class Engine:
         val_b = bytes(val.replace('%', '=').replace("+", " "), 'UTF-8')
         val_decode_str = decodestring(val_b)
         return val_decode_str.decode('UTF-8')
+
+    @staticmethod
+    def create_user(username, email, password):
+        return User(username=username, email=email, password=password)
 
 
 class SingletonByName(type):
