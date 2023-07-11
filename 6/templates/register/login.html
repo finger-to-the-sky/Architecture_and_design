@@ -3,7 +3,7 @@
 {% block content %}
 <div class="alt">
     <h2>Login</h2>
-    <form method="post" action="#">
+    <form method="post" action="/login/">
         <ul>
             <li><input type="email" name="email" class="form-fields" placeholder="Email"/>
             </li>
@@ -12,6 +12,9 @@
             <li>
                 <button type="submit" class="submit-button"> Log In</button>
             </li>
+            {% if error %}
+            <p style="color: red">{{ error }}</p>
+            {% endif %}
         </ul>
     </form>
 </div>

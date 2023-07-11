@@ -116,8 +116,20 @@ class ErrorNotFound404:
 
 @AppRoute(routes=routes, url='/login/')
 class LoginView:
+
     def __call__(self, request):
-        return '200 OK', render('register/login.html')
+        if request['method'] == 'POST':
+            data = request['data']
+            email, password = site.decode_value(data['email']), site.decode_value(data['password'])
+            for user in site.users:
+                if user.email == email and user.password == password:
+                    print(f'Пользователь {user.username} авторизован!')
+                    Engine.current_user = user.username
+                    return '200 OK', render('index.html')
+                else:
+                    return '200 OK', render('register/login.html', error='Неверный Email или Password')
+        else:
+            return '200 OK', render('register/login.html')
 
 
 @AppRoute(routes=routes, url='/register/')
@@ -126,10 +138,10 @@ class RegistrationView:
         if request['method'] == 'POST':
             data = request['data']
             username, email, password, confirm_password = \
-                site.decode_value(data['username']),\
-                site.decode_value(data['email']),\
-                site.decode_value(data['password']), \
-                site.decode_value(data['confirm-password'])
+                site.decode_value(data['username']), \
+                    site.decode_value(data['email']), \
+                    site.decode_value(data['password']), \
+                    site.decode_value(data['confirm-password'])
 
             if password == confirm_password:
                 new_user = site.create_user(username=username, email=email, password=password)

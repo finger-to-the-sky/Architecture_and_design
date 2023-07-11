@@ -18,7 +18,13 @@
 						<li><a href="/">Главная</a></li>
 						<li><a href="/genres/">Жанры</a></li>
 						<li><a href="/films/">Фильмы</a></li>
-						<li><a href="/login/">Login</a></li>
+
+						{% if current_user != "Guest" %}
+							<li><a href="#">{{current_user}}</a></li>
+							<li><a href="#">Logout</a></li>
+						{% else %}
+							<li><a href="/login/">Login</a></li>
+						{% endif %}
 						<li><a href="/register/">Sign Up</a></li>
 					</ul>
 			</header>

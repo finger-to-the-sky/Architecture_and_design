@@ -69,6 +69,7 @@ class Genre:
 
 # Main Interface
 class Engine:
+    current_user = 'Guest'
 
     def __init__(self):
         self.films = []
