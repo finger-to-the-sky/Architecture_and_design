@@ -1,33 +1,35 @@
-from zagmak_framework.templator import render
+from zagmak_framework.templator import render, CurrentUserDecorator
 from patterns.creational_patterns import Engine, Logger
 from patterns.structural_patterns import Debug, AppRoute
+from patterns.behavioral_patterns import ListView, EmailNotifier, BaseSerializer
 
 site = Engine()
 logger = Logger('views')
-routes = {
-}
+email_notifier = EmailNotifier()
+routes = {}
 
 
 @AppRoute(routes=routes, url='/')
 class IndexView:
     @Debug(name='Index')
     def __call__(self, requests):
+        logger.log('Index')
         return '200 OK', render('index.html', objects_list=site.genres)
 
 
-@AppRoute(routes=routes, url='/films/')
-class FilmsView:
+@AppRoute(routes=routes, url='/films-list/')
+class FilmsListView:
     def __call__(self, requests):
         logger.log('Films List')
         try:
             genre = site.find_genre_by_id(int(requests['requests_params']['id']))
-            return '200 OK', render('films/films.html',
-                                    object_list=genre.films,
+            return '200 OK', render('films/films_list.html',
+                                    objects_list=genre.films,
                                     name=genre.name,
                                     id=genre.id)
         except KeyError:
-            return '200 OK', render('films/films.html',
-                                    object_list=site.films)
+            return '200 OK', render('films/films_list.html',
+                                    objects_list=site.films)
 
 
 @AppRoute(routes=routes, url='/create-film/')
@@ -42,11 +44,19 @@ class CreateFilmView:
             if self.genre_id != -1:
                 genre = site.find_genre_by_id(self.genre_id)
                 film = site.create_film('translated', name, genre)
-                site.films.append(film)
-            return '200 OK', render('films/films.html',
-                                    object_list=genre.films,
-                                    name=genre.name,
-                                    id=self.genre_id)
+                film.observers.append(email_notifier)
+                try:
+
+                    user = site.get_user(CurrentUserDecorator.current_user)
+                    film.add_subscribers(user)
+                    site.films.append(film)
+
+                    return '200 OK', render('films/films_list.html',
+                                            objects_list=genre.films,
+                                            name=genre.name,
+                                            id=self.genre_id)
+                except Exception:
+                    return '404 Error', 'You Need Authorization of admin user.'
         else:
             try:
                 self.genre_id = int(requests['requests_params']['id'])
@@ -101,8 +111,8 @@ class CopyFilms:
                 new_film.name = f'copy{name}'
                 site.films.append(new_film)
 
-            return '200 OK', render('films/films.html',
-                                    object_list=site.films,
+            return '200 OK', render('films/films_list.html',
+                                    objects_list=site.films,
                                     name=new_film.genre.name)
         except KeyError:
             return '200 OK', 'Film not found'
@@ -117,14 +127,18 @@ class ErrorNotFound404:
 @AppRoute(routes=routes, url='/login/')
 class LoginView:
 
+
     def __call__(self, request):
+        logger.log('Login')
         if request['method'] == 'POST':
             data = request['data']
             email, password = site.decode_value(data['email']), site.decode_value(data['password'])
             for user in site.users:
                 if user.email == email and user.password == password:
+
                     print(f'Пользователь {user.username} авторизован!')
-                    Engine.current_user = user.username
+                    CurrentUserDecorator.current_user = user.username
+
                     return '200 OK', render('index.html')
                 else:
                     return '200 OK', render('register/login.html', error='Неверный Email или Password')
@@ -159,13 +173,35 @@ class RegistrationView:
 @AppRoute(routes=routes, url='/logout/')
 class LogoutView:
     def __call__(self, request):
-        Engine.current_user = 'Guest'
+        CurrentUserDecorator.current_user = 'Guest'
         return '200 OK', render('index.html', objects_list=site.genres)
 
 
 # Данный список нет смысла делать общедоступным, так как это не платформа общения людей между собой,
 # поэтому в шаблоне я ограничу доступ только для пользователя с ником Admin или admin.
 @AppRoute(routes=routes, url='/users-list/')
-class UsersListView:
+class UsersListView(ListView):
+    queryset = site.users
+    template_name = 'users/user_list.html'
+
+
+@AppRoute(routes=routes, url='/film/')
+class FilmView:
+
     def __call__(self, request):
-        return '200 OK', render('users/user_list.html', users_list=site.users)
+        request_params = request['requests_params']
+
+        try:
+            name = request_params['name']
+            film = site.find_film(name)
+            if film:
+                return render('films/film.html', name=name)
+        except KeyError:
+            return 'Film Not Found'
+
+
+@AppRoute(routes=routes, url='/api/')
+class FilmApi:
+    @Debug(name='FilmApi')
+    def __call__(self, request):
+        return '200 OK', BaseSerializer(site.films).save()

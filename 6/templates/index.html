@@ -6,7 +6,7 @@
         <ul>
             {% for item in objects_list %}
                 <li>
-                     <a href="/films/?id={{item.id}}">{{item.name}}</a>
+                     <a href="/films-list/?id={{item.id}}">{{item.name}}</a>
                     <span>({{item.films_count()}})</span>
                 </li>
             {% endfor %}

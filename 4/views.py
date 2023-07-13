@@ -13,12 +13,12 @@ def films_view(requests):
     logger.log('Films List')
     try:
         genre = site.find_genre_by_id(int(requests['requests_params']['id']))
-        return '200 OK', render('Elements/films.html',
+        return '200 OK', render('Elements/films_list.html',
                                 object_list=genre.films,
                                 name=genre.name,
                                 id=genre.id)
     except KeyError:
-        return '200 OK', render('Elements/films.html',
+        return '200 OK', render('Elements/films_list.html',
                                 object_list=site.films)
         return '200 OK', 'No films have been added yet'
 
@@ -35,7 +35,7 @@ class CreateFilmView:
                 genre = site.find_genre_by_id(self.genre_id)
                 film = site.create_film('translated', name, genre)
                 site.films.append(film)
-            return '200 OK', render('Elements/films.html',
+            return '200 OK', render('Elements/films_list.html',
                                     object_list=genre.films,
                                     name=genre.name,
                                     id=self.genre_id)
@@ -85,7 +85,7 @@ def copy_films(request):
             new_film.name = f'copy{name}'
             site.films.append(new_film)
 
-        return '200 OK', render('Elements/films.html',
+        return '200 OK', render('Elements/films_list.html',
                                 object_list=site.films,
                                 name=new_film.genre.name)
     except KeyError:

@@ -1,5 +1,7 @@
 from copy import deepcopy
 from quopri import decodestring
+from .behavioral_patterns import Subject, FileWriter
+from zagmak_framework.templator import render
 
 
 # Так как пользователи не будут иметь типы, потому что все, что они будут делать
@@ -13,6 +15,7 @@ class User:
         self.username = username
         self.email = email
         self.password = password
+        self.channels = []
 
 
 # Prototype method
@@ -22,12 +25,19 @@ class FilmPrototype:
         return deepcopy(self)
 
 
-class Film(FilmPrototype):
+class Film(FilmPrototype, Subject):
 
     def __init__(self, name, genre):
         self.name = name
         self.genre = genre
         self.genre.films.append(self)
+        self.users = []
+        super().__init__()
+
+    def add_subscribers(self, subscriber: User):
+        self.users.append(subscriber)
+        subscriber.channels.append(self)
+        self.notify()
 
 
 class OriginalFilm(Film):
@@ -69,8 +79,6 @@ class Genre:
 
 # Main Interface
 class Engine:
-    current_user = 'Guest'
-
     def __init__(self):
         self.films = []
         self.genres = []
@@ -106,6 +114,10 @@ class Engine:
     def create_user(username, email, password):
         return User(username=username, email=email, password=password)
 
+    def get_user(self, name):
+        for user in self.users:
+            if user.username == name:
+                return user
 
 class SingletonByName(type):
 
@@ -128,9 +140,10 @@ class SingletonByName(type):
 
 class Logger(metaclass=SingletonByName):
 
-    def __init__(self, name):
+    def __init__(self, name, writer=FileWriter):
         self.name = name
+        self.writer = writer(self.name)
 
-    @staticmethod
-    def log(text):
-        print('INFO:', text)
+    def log(self, text):
+        text = f'log---> {text}'
+        self.writer.write(text)

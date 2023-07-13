@@ -1,9 +1,20 @@
 from jinja2.environment import Environment
 from jinja2 import FileSystemLoader
-from .template_user_decorator import current_user_decorator
+# from .template_user_decorator import current_user_decorator
 
 
-@current_user_decorator
+class CurrentUserDecorator:
+    current_user = 'Guest'
+
+    def __init__(self, func):
+        self.func = func
+
+    def __call__(self, *args, **kwargs):
+        kwargs['current_user'] = self.current_user
+        return self.func(*args, **kwargs)
+
+
+@CurrentUserDecorator
 def render(template_name, folder='templates', **kwargs):
     """
 
