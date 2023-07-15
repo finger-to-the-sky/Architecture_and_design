@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+
+<h2>Genres List</h2>
+<form action="/create-genre/" target="_blank">
+    <button>Add Genre</button>
+</form>
+    <ul>
+        {% for item in objects_list %}
+        <li class="list_component">
+            {{item.name}} <span>({{item.films_count()}})</span>
+        </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
