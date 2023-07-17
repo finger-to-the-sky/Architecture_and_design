@@ -1,0 +1,18 @@
+{% extends 'base.html'%}
+
+{% block content %}
+
+
+{% if id or id == 0 %}
+<h2>{{ name }}</h2>
+<a href="/create-film/?id={{id}}">Добавить Фильм</a>
+{% else %}
+<h2>Films List</h2>
+{% endif %}
+
+{% for i in objects_list %}
+
+<p class="list_component"><a href="/film/?name={{i.name}}" style="margin-right: 8px">{{i.name}}</a>
+    <a href="/copy-film/?name={{i.name}}">скопировать</a></p>
+{% endfor %}
+{% endblock %}
